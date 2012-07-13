@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<conf>
+    <account>sdfsdf</account>
+    <fixconf>C:/work/TT/conf/fix/TT_LIVEprice.cfg</fixconf>
+     <password>sdf$</password>
+
+    <messaging>
+        <user>sdfsdf</user>
+        <password>sdf</password>
+        <vhost>dev</vhost>
+        <ipaddress>127.0.0.1</ipaddress>
+        <port>5672</port>
+    </messaging>
+
+
+
+    <instruments>
+        <!--
+        <instrument>
+            <sid>1</sid>
+            <symbol>ES</symbol>
+            <exchange>CME</exchange>
+            <securityid>00A0FL00ESZ</securityid>
+            <exchticksize>25.0</exchticksize>
+            <securitytype>FUT</securitytype>
+        </instrument>
+-->
+        <instrument>
+                         <sid>1</sid>
+                         <symbol>HOCL</symbol>
+                         <exchange>CME</exchange>
+                         <securityid>00CHOCL200A0FL00CLZ1100A0FL00HOZ1</securityid>
+                         <exchticksize>1.0</exchticksize>
+                         <securitytype>MLEG</securitytype>
+                     </instrument>
+
+
+    </instruments>
+</conf>
+

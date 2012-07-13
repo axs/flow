@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<conf>
+    <account>sdfSIM</account>
+    <fixconf>C:/work/TT/conf/fix/TT_SIMprice.cfg</fixconf>
+    <password>sdf</password>
+
+    <messaging>
+        <user>sdf</user>
+        <password>sdf</password>
+        <vhost>dev</vhost>
+        <ipaddress>127.0.0.1</ipaddress>
+        <port>5672</port>
+    </messaging>
+
+    <instruments>
+         <instrument>
+            <sid>1</sid>
+            <symbol>CL</symbol>
+            <exchange>TTSIM</exchange>
+            <securityid>CL01110600000000NN</securityid>
+            <exchticksize>1.0</exchticksize>
+            <securitytype>FUT</securitytype>
+        </instrument>
+
+    </instruments>
+</conf>
+

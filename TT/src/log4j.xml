@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="true">
+
+   <appender name="terminal" class="org.apache.log4j.ConsoleAppender">
+      <param name="Threshold" value="INFO"/>
+      <param name="Target" value="System.out"/>
+      <layout class="org.apache.log4j.PatternLayout">
+         <param name="ConversionPattern" value="%d{ABSOLUTE} %-5p [%c{1}] %m%n"/>
+      </layout>
+   </appender>
+
+   <!--
+   <appender name="rollfile"
+		class="org.apache.log4j.RollingFileAppender">
+		<param name="maxFileSize" value="100KB" />
+		<param name="maxBackupIndex" value="5" />
+		<param name="File" value="c:/tmp/test.log" />
+		<param name="Threshold" value="INFO"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern"
+				value="%d{ABSOLUTE} %5p %c{1}:%L - %m%n" />
+		</layout>
+	</appender>
+      -->
+
+   <!-- 
+   		Modify to DEBUG for more output, or INFO for less output 
+   	-->  
+   <logger name="com.espertech.esper.example">
+      <level value="DEBUG"/>
+   </logger>
+
+   <!-- 
+   		Disable output for specific listeners via this statement
+   <logger name="com.espertech.esper.example.transaction.RealtimeSummaryGroupListener">
+      <level value="INFO"/>
+   </logger>
+   	-->
+
+   <logger name="com.espertech.esper">
+      <level value="WARN"/>
+   </logger>
+
+
+   <root>
+      <level value="INFO"/>
+      <appender-ref ref="terminal"/>
+    </root>
+   
+</log4j:configuration>

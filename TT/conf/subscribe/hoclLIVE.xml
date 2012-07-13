@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<conf>
+    <account>sdfg</account>
+    <fixconf>C:/work/TT/conf/fix/TT_LIVEorder.cfg</fixconf>
+    <password>dfg$</password>
+
+    <messaging>
+        <user>gbdf</user>
+        <password>dfgb</password>
+        <vhost>dev</vhost>
+        <ipaddress>127.0.0.1</ipaddress>
+        <port>5672</port>
+    </messaging>
+
+    <instruments>
+        <instrument>
+                 <sid>1</sid>
+                 <symbol>HOCL</symbol>
+                 <exchange>CME</exchange>
+                 <securityid>00CHOCL200A0FL00CLZ1100A0FL00HOZ1</securityid>
+                 <exchticksize>1.0</exchticksize>
+                 <securitytype>MLEG</securitytype>
+             </instrument>
+    </instruments>
+</conf>
+

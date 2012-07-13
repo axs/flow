@@ -1,0 +1,592 @@
+<project name="alex" basedir="." default="generate" xmlns:doxygen="antlib:org.doxygen.tools">
+
+    <property environment="env" />
+
+    <property name="dest.dir" value="build" />
+    <property name="dest.dir.classes" value="${dest.dir}/classes" />
+    <property name="dest.dir.lib" value="${dest.dir}/lib" />
+
+    <property name="quickfix.lib" value="C:\code\java\quickfixj" />
+    <property name="quickfix.lib.extra" value="${quickfix.lib}\lib" />
+    <property name="confdir.fix" value="C:\work\TT\conf\fix" />
+    <property name="confdir.subscribe" value="C:\work\TT\conf\subscribe" />
+    <property name="COMMONS.home" value="c:/code/java/lib" />
+    <property name="findbugs.home" value="C:/code/java/findbugs-1.3.9/" />
+    <property name="ESPER.home" value="C:/code/java/esper/esper-4.2.0" />
+    <property name="ESPER.lib" value="${ESPER.home}/esper/lib" />
+    <property name="ESPER.io" value="${ESPER.home}/esperio-springjms/lib" />
+    <property name="spring.lib" value="C:/code/java/spring_framework/dist" />
+    <property name="rabbitmq.lib" value="C:/bin/rabbitmq/rabbitmq-java-client-bin-2.3.1" />
+    <property name="gson.lib" value="C:/code/java/google-gson-1.6" />
+    <property name="cep.conf.dir" value="c:/work/TT/conf/cep" />
+
+
+    <property name="springconf" value="springapp.xml" />
+    <echo message="springconf is set to = ${springconf}"/>
+
+    <path id="gson.class.path">
+        <fileset dir="${gson.lib}">
+            <include name="*.jar" />
+            <exclude name="*javadoc*"/>
+            <exclude name="*sources*"/>
+        </fileset>
+    </path>
+
+
+    <path id="spring.class.path">
+        <fileset dir="${spring.lib}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="rabbitmq.class.path">
+        <fileset dir="${rabbitmq.lib}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="commons.class.path">
+        <fileset dir="${COMMONS.home}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="build.class.path">
+        <fileset dir="${quickfix.lib}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="run.class.path">
+        <fileset dir="${quickfix.lib}">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${quickfix.lib.extra}">
+            <include name="*.jar" />
+        </fileset>
+
+    </path>
+    <!--
+        <path id="run.class.path">
+            <fileset dir="${quickfix.lib.extra}">
+                <include name="*.jar" />
+            </fileset>
+        </path>
+    -->
+
+
+    <path id="esperhome.class.path">
+        <fileset dir="${ESPER.home}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+
+    <path id="esperlib.class.path">
+        <fileset dir="${ESPER.lib}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+    <path id="esperio.class.path">
+        <fileset dir="${ESPER.io}">
+            <include name="*.jar" />
+        </fileset>
+    </path>
+
+
+    <target name="clean">
+        <delete dir="${dest.dir}" />
+        <delete dir="build" />
+    </target>
+
+
+    <target name="prepare">
+        <mkdir dir="${dest.dir}" />
+        <mkdir dir="${dest.dir.classes}" />
+        <mkdir dir="${dest.dir.lib}" />
+    </target>
+
+
+    <target name="doxygen">
+        <doxygen:doxygen>
+            <property name="INPUT" value="./src/com/" />
+            <property name="RECURSIVE" value="yes" />
+            <property name="GENERATE_LATEX" value="false" />
+            <property name="PROJECT_NAME" value="PRC TT" />
+            <property name="EXTRACT_ALL" value="YES" />
+            <property name="INLINE_SOURCE" value="YES" />
+        </doxygen:doxygen >
+    </target>
+
+
+    <taskdef name="findbugs" classname="edu.umd.cs.findbugs.anttask.FindBugsTask"/>
+
+    <target name="findbugs"  >
+        <findbugs home="${findbugs.home}"
+                 output="html"
+                 outputFile="prc_findbugs.html" >
+            <sourcePath path="./src/" />
+            <class location="${dest.dir}/" />
+        </findbugs>
+    </target>
+
+
+    <target name="generate" depends="clean,prepare">
+        <javac srcdir="./src" destdir="${dest.dir.classes}"  >
+            <classpath refid="build.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="spring.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+            </classpath>
+            <exclude name="AlexMkt.java" />
+        </javac>
+
+        <copy todir="${dest.dir.classes}">
+            <fileset dir="src" excludes="**/*.java"/>
+        </copy>
+        <copy todir="${dest.dir.classes}">
+                    <fileset dir="conf/cep" />
+                </copy>
+
+
+        <jar destfile="${dest.dir.lib}/prc_tt.jar" basedir="${dest.dir.classes}"/>
+    </target>
+
+
+    <!--
+   <target name="run">
+       <java classname="AppMain"   fork="true">
+           <classpath refid="run.class.path" />
+           <classpath refid="commons.class.path" />
+           <classpath refid="esperhome.class.path" />
+           <classpath refid="esperlib.class.path" />
+           <classpath refid="esperio.class.path" />
+           <classpath refid="rabbitmq.class.path" />
+
+           <classpath>
+               <pathelement location="./"/>
+               <pathelement location="${dest.dir.classes}" />
+           </classpath>
+
+           <arg value="${confdir.fix}/Alex.cfg"/>
+       </java>
+   </target>
+      -->
+
+    <!--
+    <target name="mkt">
+        <java classname="AppMkt"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.fix}/AlexMkt.cfg"/>
+        </java>
+    </target>
+       -->
+
+      <!--
+    <target name="tt">
+        <java classname="TTtest"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/test.xml"/>
+        </java>
+    </target>
+
+
+
+    <target name="ttLIVE">
+        <java classname="TTtest"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/testLIVE.xml"/>
+        </java>
+    </target>
+        -->
+
+    <!--
+   <target name="ttordersend">
+   <java classname="TTtestOrdergetSend"   fork="true">
+       <classpath refid="run.class.path" />
+       <classpath refid="commons.class.path" />
+       <classpath refid="esperhome.class.path" />
+       <classpath refid="esperlib.class.path" />
+       <classpath refid="esperio.class.path" />
+       <classpath refid="rabbitmq.class.path" />
+       <classpath refid="gson.class.path" />
+
+       <classpath>
+           <pathelement location="./"/>
+           <pathelement location="${dest.dir.classes}" />
+       </classpath>
+       <arg value="${confdir.subscribe}/tt.xml"/>
+       </java>
+</target>
+    -->
+
+    <target name="gatewayLIVE">
+        <java classname="GatewayMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/gatewayLIVE.xml"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+
+    <target name="gateway">
+        <java classname="GatewayMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt.xml"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+    <target name="datafeed">
+        <java classname="DataFeedMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="-q"/>
+            <arg value="Y"/>
+            <arg value="-s"/>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+            <arg value="-t"/>
+            <arg value="N"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+    <!--
+    <target name="tradefeed">
+        <java classname="TradeFeedMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+      -->
+
+
+    <target name="datafeedLIVE">
+        <java classname="DataFeedMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="-q"/>
+            <arg value="Y"/>
+            <arg value="-s"/>
+            <arg value="${confdir.subscribe}/tt_publisherLIVE.xml"/>
+            <arg value="-t"/>
+            <arg value="Y"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+    <!--
+    <target name="tradefeedLIVE">
+        <java classname="TradeFeedMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisherLIVE.xml"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+          -->
+
+    <target name="quick">
+        <java classname="QuickQuoteMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+        </java>
+    </target>
+
+
+    <target name="mm">
+        <java classname="MarketMakerMain"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+        </java>
+    </target>
+
+     <!--
+    <target name="ttconsume">
+        <java classname="RabbitMQConsumer"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+        </java>
+    </target>
+    -->
+
+    <!--
+    <target name="tttestorder">
+        <java classname="TTtestOrder"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+            <arg value="fred"/>
+        </java>
+    </target>
+     -->
+
+    <!--
+    <target name="tttestorderX">
+        <java classname="TTtestOrder"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/tt_publisher.xml"/>
+            <arg value="barney"/>
+        </java>
+    </target>
+     -->
+
+    <!--
+    <target name="cep">
+        <java classname="CEPtest"   fork="true">
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="gson.class.path" />
+
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement location="${dest.dir.classes}" />
+            </classpath>
+            <arg value="${confdir.subscribe}/es.xml"/>
+        </java>
+    </target>
+     -->
+
+
+    <target name="runvolatility">
+        <java classname="CEPMain" fork="true" >
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="spring.class.path" />
+            <classpath refid="gson.class.path" />
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement  location="${dest.dir.classes}" />
+                <pathelement  location="${cep.conf.dir}" />
+            </classpath>
+            <arg value="-c"/>
+            <arg value="c:/work/TT/conf/subscribe/es.xml"/>
+            <arg value="-s"/>
+            <arg value="volatility.xml"/>
+            <arg value="-q"/>
+            <arg value="volatility_qry"/>
+            <arg value="-i"/>
+            <arg value="2"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+    <target name="runkeyreversal">
+        <java classname="CEPMain" fork="true" >
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="spring.class.path" />
+            <classpath refid="gson.class.path" />
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement  location="${dest.dir.classes}" />
+                <pathelement  location="${cep.conf.dir}" />
+            </classpath>
+            <arg value="-c"/>
+            <arg value="c:/work/TT/conf/subscribe/es.xml"/>
+            <arg value="-s"/>
+            <arg value="keyreversal.xml"/>
+            <arg value="-q"/>
+            <arg value="keyreversal_qry"/>
+            <arg value="-i"/>
+            <arg value="2"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+    <target name="runvolume">
+        <java classname="CEPMain" fork="true" >
+            <classpath refid="run.class.path" />
+            <classpath refid="commons.class.path" />
+            <classpath refid="esperhome.class.path" />
+            <classpath refid="esperlib.class.path" />
+            <classpath refid="esperio.class.path" />
+            <classpath refid="rabbitmq.class.path" />
+            <classpath refid="spring.class.path" />
+            <classpath refid="gson.class.path" />
+            <classpath>
+                <pathelement location="./"/>
+                <pathelement  location="${dest.dir.classes}" />
+                <pathelement  location="${cep.conf.dir}" />
+            </classpath>
+            <arg value="-c"/>
+            <arg value="c:/work/TT/conf/subscribe/cl.xml"/>
+            <arg value="-s"/>
+            <arg value="volume.xml"/>
+            <arg value="-q"/>
+            <arg value="volume_qry"/>
+            <arg value="-i"/>
+            <arg value="3"/>
+            <jvmarg value="-server" />
+        </java>
+    </target>
+
+</project>
